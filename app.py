@@ -1,11 +1,13 @@
 
 from flask import Flask, request, redirect, render_template_string
 from markupsafe import escape
+from collections import deque
 
 app = Flask(__name__)
 
 # In-memory message storage
-messages = []
+MAX_MESSAGES = 100
+messages = deque(maxlen=MAX_MESSAGES)
 
 CHAT_HTML = '''
 <!doctype html>
@@ -94,8 +96,12 @@ CHAT_HTML = '''
           chatBox.innerHTML = '';
           (data.messages || []).forEach(function(m) {
             var div = document.createElement('div');
+            var b = document.createElement('b');
+            b.textContent = m[0]; // Safely set username
+            var text = document.createTextNode(': ' + m[1]); // Safely set message
             div.className = 'msg';
-            div.innerHTML = '<b>' + m[0] + '</b>: ' + m[1];
+            div.appendChild(b);
+            div.appendChild(text);
             chatBox.appendChild(div);
           });
           chatBox.scrollTop = chatBox.scrollHeight;
@@ -132,13 +138,13 @@ def chat():
         message = escape(request.form.get('message', ''))
         if message:
             messages.append((username, message))
-        return ('', 204)  # No content response, for JS client
+        return ('', 204)  # No content response for JS client
     return render_template_string(CHAT_HTML)
 
 # API to get messages
 @app.route('/messages')
 def get_messages():
-    return {'messages': messages}
+    return {'messages': list(messages)}
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
