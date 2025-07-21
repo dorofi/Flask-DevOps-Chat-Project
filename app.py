@@ -1,5 +1,6 @@
 
 from flask import Flask, request, redirect, render_template_string
+from markupsafe import escape
 
 app = Flask(__name__)
 
@@ -126,8 +127,9 @@ CHAT_HTML = '''
 def chat():
     global messages
     if request.method == 'POST':
-        username = request.form.get('username', 'Guest')
-        message = request.form.get('message', '')
+        # Sanitize user input to prevent XSS attacks
+        username = escape(request.form.get('username', 'Guest'))
+        message = escape(request.form.get('message', ''))
         if message:
             messages.append((username, message))
         return ('', 204)  # No content response, for JS client
