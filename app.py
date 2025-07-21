@@ -130,7 +130,7 @@ def chat():
         message = request.form.get('message', '')
         if message:
             messages.append((username, message))
-        return ('', 204)  # Без перезагрузки, для JS
+        return ('', 204)  # No content response, for JS client
     return render_template_string(CHAT_HTML)
 
 # API to get messages
