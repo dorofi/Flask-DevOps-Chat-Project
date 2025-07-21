@@ -3,12 +3,12 @@ from flask import Flask, request, redirect, render_template_string
 
 app = Flask(__name__)
 
-# Хранилище сообщений в памяти
+# In-memory message storage
 messages = []
 
 CHAT_HTML = '''
 <!doctype html>
-<html lang="ru">
+<html lang="en">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -106,14 +106,14 @@ CHAT_HTML = '''
   </head>
   <body>
     <div class="container">
-      <h2 style="text-align:center;">Общий чат Flask</h2>
+      <h2 style="text-align:center;">Flask Group Chat</h2>
       <div class="chat-box" id="chat-box">
-        <!-- Сообщения будут подгружаться через JS -->
+        <!-- Messages will be loaded via JS -->
       </div>
       <form method="post" onsubmit="sendMessage(event)">
-        <input name="username" placeholder="Ваше имя" required>
-        <input name="message" placeholder="Сообщение" required>
-        <button type="submit">Отправить</button>
+        <input name="username" placeholder="Your name" required>
+        <input name="message" placeholder="Your message" required>
+        <button type="submit">Send</button>
       </form>
     </div>
   </body>
@@ -121,19 +121,19 @@ CHAT_HTML = '''
 '''
 
 
-# Главная страница чата
+# Main chat page
 @app.route('/', methods=['GET', 'POST'])
 def chat():
     global messages
     if request.method == 'POST':
-        username = request.form.get('username', 'Гость')
+        username = request.form.get('username', 'Guest')
         message = request.form.get('message', '')
         if message:
             messages.append((username, message))
         return ('', 204)  # Без перезагрузки, для JS
     return render_template_string(CHAT_HTML)
 
-# API для получения сообщений
+# API to get messages
 @app.route('/messages')
 def get_messages():
     return {'messages': messages}
